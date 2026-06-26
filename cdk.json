@@ -1,0 +1,9 @@
+{
+  "app": "node --import tsx bin/app.ts",
+  "context": {
+    "bedrockModelId": "apac.amazon.nova-pro-v1:0",
+    "scheduleExpression": "cron(0 8 ? * MON-FRI *)",
+    "scheduleTimezone": "Asia/Tokyo",
+    "slackSecretName": "aws-bedrock-news-curator/slack-webhook"
+  }
+}

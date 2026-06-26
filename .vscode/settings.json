@@ -1,0 +1,24 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/.turbo": true,
+    "**/cdk.out": true,
+    "**/dist": true,
+    "**/node_modules": true
+  },
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "search.exclude": {
+    "**/cdk.out": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/pnpm-lock.yaml": true
+  }
+}

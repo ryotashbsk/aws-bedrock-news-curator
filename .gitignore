@@ -1,0 +1,8 @@
+node_modules/
+cdk.out/
+dist/
+.env
+*.tsbuildinfo
+.DS_Store
+assume-deploy-role-policy.json
+trust-policy.json
