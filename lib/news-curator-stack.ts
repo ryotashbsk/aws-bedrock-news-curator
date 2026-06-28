@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-const bedrockDefaultModelId = "apac.amazon.nova-pro-v1:0";
+const bedrockDefaultModelId = "apac.amazon.nova-lite-v1:0";
 
 const resourceNames = {
   functionName: "AwsBedrockNewsCuratorFunction",
@@ -139,7 +139,7 @@ export class NewsCuratorStack extends Stack {
     new CfnSchedule(this, "WeekdayMorningSchedule", {
       name: resourceNames.schedulerName,
       flexibleTimeWindow: { mode: "OFF" },
-      scheduleExpression: scheduleExpression ?? "cron(0 8 ? * MON-FRI *)",
+      scheduleExpression: scheduleExpression ?? "cron(0 8 * * ? *)",
       scheduleExpressionTimezone: scheduleTimezone ?? "Asia/Tokyo",
       target: {
         arn: curatorFunction.functionArn,
@@ -153,7 +153,7 @@ export class NewsCuratorStack extends Stack {
   }
 
   private bedrockModelResourceArns(modelId: string): string[] {
-    const isInferenceProfile = !modelId.startsWith("amazon.");
+    const isInferenceProfile = !isFoundationModelId(modelId);
     if (!isInferenceProfile) {
       return [this.foundationModelArn(modelId)];
     }
@@ -181,7 +181,17 @@ export class NewsCuratorStack extends Stack {
   }
 }
 
+function isFoundationModelId(modelId: string): boolean {
+  return ["amazon.", "anthropic.", "ai21.", "cohere.", "meta.", "mistral."].some((prefix) =>
+    modelId.startsWith(prefix),
+  );
+}
+
 function toFoundationModelId(modelId: string): string {
-  const amazonIndex = modelId.indexOf("amazon.");
-  return amazonIndex === -1 ? modelId : modelId.slice(amazonIndex);
+  const providerIndex = ["amazon.", "anthropic.", "ai21.", "cohere.", "meta.", "mistral."]
+    .map((providerPrefix) => modelId.indexOf(providerPrefix))
+    .filter((index) => index >= 0)
+    .sort((left, right) => left - right)[0];
+
+  return providerIndex === undefined ? modelId : modelId.slice(providerIndex);
 }

@@ -4,7 +4,7 @@ import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
 import { NewsCuratorStack } from "../lib/news-curator-stack.js";
 
-void test("stack defines weekday JST scheduler and state store", () => {
+void test("stack defines daily JST scheduler and state store", () => {
   const app = new App();
   const stack = new NewsCuratorStack(app, "TestStack", {
     env: { region: "ap-northeast-1" },
@@ -13,7 +13,7 @@ void test("stack defines weekday JST scheduler and state store", () => {
 
   template.hasResourceProperties("AWS::Scheduler::Schedule", {
     Name: "AwsBedrockNewsCuratorWeekdayMorningSchedule",
-    ScheduleExpression: "cron(0 8 ? * MON-FRI *)",
+    ScheduleExpression: "cron(0 8 * * ? *)",
     ScheduleExpressionTimezone: "Asia/Tokyo",
     Target: {
       RetryPolicy: {
@@ -92,7 +92,7 @@ void test("stack defines weekday JST scheduler and state store", () => {
                   {
                     Ref: "AWS::AccountId",
                   },
-                  ":inference-profile/apac.amazon.nova-pro-v1:0",
+                  ":inference-profile/apac.amazon.nova-lite-v1:0",
                 ],
               ],
             },
@@ -104,7 +104,7 @@ void test("stack defines weekday JST scheduler and state store", () => {
                   {
                     Ref: "AWS::Partition",
                   },
-                  ":bedrock:*::foundation-model/amazon.nova-pro-v1:0",
+                  ":bedrock:*::foundation-model/amazon.nova-lite-v1:0",
                 ],
               ],
             },

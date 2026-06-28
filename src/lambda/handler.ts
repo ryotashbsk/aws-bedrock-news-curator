@@ -45,7 +45,7 @@ export async function handler(): Promise<HandlerResult> {
     const messages = formatSlackMessages(category, curated, new Date());
     await postSlackMessages(webhookUrl, messages);
 
-    for (const topic of curated.todaysUpdates.concat(curated.recentImportantUpdates)) {
+    for (const topic of curated.todaysUpdates) {
       await historyStore.markNotified(category.id, topic);
     }
 
@@ -62,7 +62,6 @@ function filterCuratedResultByCandidates(
   const candidateUrls = new Set(candidates.map((candidate) => normalizeUrl(candidate.url)));
   return {
     todaysUpdates: filterCuratedTopics(result.todaysUpdates, candidateUrls),
-    recentImportantUpdates: filterCuratedTopics(result.recentImportantUpdates, candidateUrls),
   };
 }
 

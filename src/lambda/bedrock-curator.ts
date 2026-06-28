@@ -11,7 +11,7 @@ export async function curateWithBedrock(input: {
   readonly previousUrls: readonly string[];
 }): Promise<CuratedCategoryResult> {
   if (input.candidates.length === 0) {
-    return { todaysUpdates: [], recentImportantUpdates: [] };
+    return { todaysUpdates: [] };
   }
 
   const response = await bedrockClient.send(
@@ -53,6 +53,7 @@ export function buildCuratorPrompt(input: {
     "次のカテゴリ指示に従い、公式一次情報の候補だけから Slack 投稿用のニュースを選別する。",
     "候補に無い情報、公式リンクが無い情報、推測情報は採用しない。",
     "Slack 投稿に表示される title, summary, changed, engineerUse, nonEngineerUse, adoption, cautions は必ず自然な日本語に翻訳・要約する。",
+    "summary は180〜240文字を目安にする。100文字未満の短文にせず、何が変わったか、誰に影響するか、チームで確認すべき観点を1文ずつ含める。",
     "英語の公式タイトルや本文をそのまま貼り付けない。ただしサービス名、会社名、製品名、API名、モデル名などの固有名詞は原語のまま残してよい。",
     "出力は Markdown ではなく JSON のみ。",
     "JSON schema:",
@@ -69,7 +70,6 @@ export function buildCuratorPrompt(input: {
           officialLink: "string",
         },
       ],
-      recentImportantUpdates: [],
     }),
     "",
     "カテゴリ指示:",
@@ -91,7 +91,6 @@ export function parseCuratedResult(text: string): CuratedCategoryResult {
 
   return {
     todaysUpdates: parseTopicArray(parsed.todaysUpdates, "todaysUpdates"),
-    recentImportantUpdates: parseTopicArray(parsed.recentImportantUpdates, "recentImportantUpdates"),
   };
 }
 

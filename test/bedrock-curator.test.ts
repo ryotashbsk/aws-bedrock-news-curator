@@ -16,8 +16,7 @@ void test("parseCuratedResult extracts JSON from fenced response", () => {
       "cautions": "Cautions",
       "officialLink": "https://example.com/update"
     }
-  ],
-  "recentImportantUpdates": []
+  ]
 }
 \`\`\``);
 
@@ -26,5 +25,5 @@ void test("parseCuratedResult extracts JSON from fenced response", () => {
 });
 
 void test("parseCuratedResult rejects missing arrays", () => {
-  assert.throws(() => parseCuratedResult('{"todaysUpdates":[]}'), /recentImportantUpdates/);
+  assert.throws(() => parseCuratedResult("{}"), /todaysUpdates/);
 });

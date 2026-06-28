@@ -2,6 +2,7 @@ import type { CuratedCategoryResult, CuratedTopic, NewsCategory } from "./types.
 
 const maxBlocksPerMessage = 45;
 const maxTextLength = 2800;
+const categoryDivider = "━━━━━━━━━━━━━━━━━━━━";
 
 type SlackBlock =
   | {
@@ -45,19 +46,10 @@ export function formatSlackMessages(category: NewsCategory, result: CuratedCateg
       type: "section",
       text: {
         type: "mrkdwn",
-        text: "━━━━━━━━━━━━━━━━━━━━",
+        text: `${categoryDivider}\n*${category.title} - ${dateLabel}*`,
       },
     },
-    {
-      type: "header",
-      text: {
-        type: "plain_text",
-        text: `${category.title} - ${dateLabel}`,
-        emoji: true,
-      },
-    },
-    ...formatSectionBlocks("今日の最新情報", result.todaysUpdates),
-    ...formatSectionBlocks("最近の重要アップデート（再掲）", result.recentImportantUpdates),
+    ...formatTopicListBlocks(result.todaysUpdates),
   ];
 
   return chunkSlackBlocks(blocks).map((messageBlocks, index) => ({
@@ -81,63 +73,34 @@ export async function postSlackMessages(webhookUrl: string, messages: readonly S
   }
 }
 
-function formatSectionBlocks(title: string, topics: readonly CuratedTopic[]): SlackBlock[] {
-  const sectionHeader: SlackBlock = {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `*${title}*`,
-    },
-  };
-
+function formatTopicListBlocks(topics: readonly CuratedTopic[]): SlackBlock[] {
   if (topics.length === 0) {
     return [
-      sectionHeader,
       {
         type: "context",
         elements: [{ type: "mrkdwn", text: "該当なし" }],
       },
-      { type: "divider" },
     ];
   }
 
-  const topicBlocks = topics.flatMap((topic, index) => formatTopicBlocks(topic, index));
-  return [sectionHeader, ...topicBlocks, { type: "divider" }];
+  return topics.flatMap((topic, index) => formatTopicBlocks(topic, index));
 }
 
 function formatTopicBlocks(topic: CuratedTopic, index: number): SlackBlock[] {
-  const fields = [
-    `*要約*\n${escapeSlackText(topic.summary)}`,
-    `*変化点*\n${escapeSlackText(topic.changed)}`,
-    `*エンジニア向け*\n${escapeSlackText(topic.engineerUse)}`,
-    topic.nonEngineerUse ? `*非エンジニア向け*\n${escapeSlackText(topic.nonEngineerUse)}` : "",
-    `*導入*\n${escapeSlackText(topic.adoption)}`,
-    `*注意*\n${escapeSlackText(topic.cautions)}`,
-  ].filter(Boolean);
-
   return [
     {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*${index + 1}. <${topic.officialLink}|${escapeSlackText(topic.title)}>*`,
+        text: truncate(
+          [
+            `*${index + 1}. ${escapeSlackText(topic.title)}*`,
+            escapeSlackText(topic.summary),
+            `<${topic.officialLink}>`,
+          ].join("\n"),
+          maxTextLength,
+        ),
       },
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: truncate(fields.join("\n\n"), maxTextLength),
-      },
-    },
-    {
-      type: "context",
-      elements: [
-        {
-          type: "mrkdwn",
-          text: `<${topic.officialLink}|公式リンク>`,
-        },
-      ],
     },
   ];
 }

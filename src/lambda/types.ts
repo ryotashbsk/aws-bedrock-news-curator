@@ -39,5 +39,4 @@ export type CuratedTopic = {
 
 export type CuratedCategoryResult = {
   readonly todaysUpdates: readonly CuratedTopic[];
-  readonly recentImportantUpdates: readonly CuratedTopic[];
 };
