@@ -9,11 +9,8 @@ void test("parseCuratedResult extracts JSON from fenced response", () => {
     {
       "title": "Model update",
       "summary": "Summary",
-      "changed": "Changed",
-      "engineerUse": "Engineer use",
-      "nonEngineerUse": "Non engineer use",
-      "adoption": "Adoption",
-      "cautions": "Cautions",
+      "impact": "Impact",
+      "checkPoint": "Check point",
       "officialLink": "https://example.com/update"
     }
   ]
@@ -22,6 +19,8 @@ void test("parseCuratedResult extracts JSON from fenced response", () => {
 
   assert.equal(result.todaysUpdates.length, 1);
   assert.equal(result.todaysUpdates[0]?.officialLink, "https://example.com/update");
+  assert.equal(result.todaysUpdates[0]?.impact, "Impact");
+  assert.equal(result.todaysUpdates[0]?.checkPoint, "Check point");
 });
 
 void test("parseCuratedResult rejects missing arrays", () => {

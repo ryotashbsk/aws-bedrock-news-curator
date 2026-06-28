@@ -12,7 +12,10 @@
         { "name": "Chrome Developers Blog", "url": "https://developer.chrome.com/blog/feed.xml", "type": "rss" },
         { "name": "web.dev", "url": "https://web.dev/feed.xml", "type": "rss" },
         { "name": "MDN Blog", "url": "https://developer.mozilla.org/en-US/blog/rss.xml", "type": "rss" },
-        { "name": "WebKit Blog", "url": "https://webkit.org/feed/", "type": "rss" }
+        { "name": "WebKit Blog", "url": "https://webkit.org/feed/", "type": "rss" },
+        { "name": "Astro Blog", "url": "https://astro.build/rss.xml", "type": "rss" },
+        { "name": "Svelte Blog", "url": "https://svelte.dev/blog/rss.xml", "type": "rss" },
+        { "name": "Vue Blog", "url": "https://blog.vuejs.org/feed.rss", "type": "rss" }
       ]
     },
     {
@@ -27,7 +30,9 @@
         { "name": "Google Cloud Blog", "url": "https://cloudblog.withgoogle.com/rss/", "type": "rss" },
         { "name": "Azure Updates", "url": "https://azurecomcdn.azureedge.net/en-us/updates/feed/", "type": "rss" },
         { "name": "PostgreSQL News", "url": "https://www.postgresql.org/about/newsarchive/", "type": "html" },
-        { "name": "Docker Blog", "url": "https://www.docker.com/blog/feed/", "type": "rss" }
+        { "name": "Docker Blog", "url": "https://www.docker.com/blog/feed/", "type": "rss" },
+        { "name": "Kubernetes Blog", "url": "https://kubernetes.io/feed.xml", "type": "rss" },
+        { "name": "GitHub Changelog", "url": "https://github.blog/changelog/feed/", "type": "rss" }
       ]
     },
     {

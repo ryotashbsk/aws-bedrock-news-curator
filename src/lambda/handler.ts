@@ -5,12 +5,15 @@ import { curateWithBedrock } from "./bedrock-curator.js";
 import { fetchCandidateTopics } from "./source-fetcher.js";
 import { createDynamoHistoryStore } from "./history-store.js";
 import { loadSlackWebhookUrl } from "./secrets.js";
-import { formatSlackMessages, postSlackMessages } from "./slack.js";
-import type { CandidateTopic, CuratedCategoryResult, CuratedTopic } from "./types.js";
+import { formatNewsHtml } from "./news-html.js";
+import { uploadNewsHtml } from "./news-page-store.js";
+import { formatDailySlackMessage, postSlackMessages } from "./slack.js";
+import type { CandidateTopic, CuratedCategoryNews, CuratedCategoryResult, CuratedTopic } from "./types.js";
 import { normalizeUrl } from "./url.js";
 
 type HandlerResult = {
   readonly postedCategories: readonly string[];
+  readonly htmlUrl: string;
 };
 
 const workspaceRoot = process.cwd();
@@ -20,6 +23,8 @@ export async function handler(): Promise<HandlerResult> {
   const config = await loadNewsConfig(env.newsConfigPath, workspaceRoot);
   const historyStore = createDynamoHistoryStore(env.notifiedUrlTableName);
   const webhookUrl = await loadSlackWebhookUrl(env.slackSecretId);
+  const currentDate = new Date();
+  const curatedCategories: CuratedCategoryNews[] = [];
   const postedCategories: string[] = [];
 
   for (const category of config.categories) {
@@ -42,17 +47,28 @@ export async function handler(): Promise<HandlerResult> {
       freshCandidates,
     );
 
-    const messages = formatSlackMessages(category, curated, new Date());
-    await postSlackMessages(webhookUrl, messages);
-
-    for (const topic of curated.todaysUpdates) {
-      await historyStore.markNotified(category.id, topic);
-    }
-
+    curatedCategories.push({ category, result: curated });
     postedCategories.push(category.id);
   }
 
-  return { postedCategories };
+  const html = formatNewsHtml({ categories: curatedCategories, date: currentDate });
+  const htmlUrl = await uploadNewsHtml({
+    bucketName: env.newsHtmlBucketName,
+    publicBaseUrl: env.newsHtmlPublicBaseUrl,
+    date: currentDate,
+    html,
+  });
+  await postSlackMessages(webhookUrl, [
+    formatDailySlackMessage({ categories: curatedCategories, date: currentDate, htmlUrl }),
+  ]);
+
+  for (const categoryNews of curatedCategories) {
+    for (const topic of categoryNews.result.todaysUpdates) {
+      await historyStore.markNotified(categoryNews.category.id, topic);
+    }
+  }
+
+  return { postedCategories, htmlUrl };
 }
 
 function filterCuratedResultByCandidates(
@@ -96,12 +112,16 @@ async function readAgentPrompt(promptPath: string): Promise<string> {
 
 function readEnvironment(): {
   readonly bedrockModelId: string;
+  readonly newsHtmlBucketName: string;
+  readonly newsHtmlPublicBaseUrl: string;
   readonly newsConfigPath: string;
   readonly notifiedUrlTableName: string;
   readonly slackSecretId: string;
 } {
   return {
     bedrockModelId: readEnv("BEDROCK_MODEL_ID"),
+    newsHtmlBucketName: readEnv("NEWS_HTML_BUCKET_NAME"),
+    newsHtmlPublicBaseUrl: readEnv("NEWS_HTML_PUBLIC_BASE_URL"),
     newsConfigPath: readEnv("NEWS_CONFIG_PATH"),
     notifiedUrlTableName: readEnv("NOTIFIED_URL_TABLE_NAME"),
     slackSecretId: readEnv("SLACK_SECRET_ID"),

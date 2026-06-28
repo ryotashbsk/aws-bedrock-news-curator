@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { App } from "aws-cdk-lib";
-import { Template } from "aws-cdk-lib/assertions";
+import { Match, Template } from "aws-cdk-lib/assertions";
 import { NewsCuratorStack } from "../lib/news-curator-stack.js";
 
 void test("stack defines daily JST scheduler and state store", () => {
@@ -32,6 +32,19 @@ void test("stack defines daily JST scheduler and state store", () => {
   template.hasResourceProperties("AWS::Lambda::Function", {
     FunctionName: "AwsBedrockNewsCuratorFunction",
     MemorySize: 512,
+    Environment: {
+      Variables: {
+        NEWS_HTML_BUCKET_NAME: {
+          Ref: Match.stringLikeRegexp("NewsHtmlBucket"),
+        },
+        NEWS_HTML_PUBLIC_BASE_URL: Match.anyValue(),
+      },
+    },
+  });
+  template.hasResourceProperties("AWS::S3::Bucket", {
+    WebsiteConfiguration: {
+      IndexDocument: "index.html",
+    },
   });
   template.hasResourceProperties("AWS::Logs::LogGroup", {
     LogGroupName: "/aws/lambda/AwsBedrockNewsCuratorFunction",
@@ -63,20 +76,24 @@ void test("stack defines daily JST scheduler and state store", () => {
   });
   template.hasResourceProperties("AWS::IAM::Policy", {
     PolicyDocument: {
-      Statement: [
-        {
+      Statement: Match.arrayWith([
+        Match.objectLike({
           Action: ["logs:CreateLogStream", "logs:PutLogEvents"],
           Effect: "Allow",
-        },
-        {
+        }),
+        Match.objectLike({
           Action: ["dynamodb:DescribeTable", "dynamodb:GetItem", "dynamodb:PutItem"],
           Effect: "Allow",
-        },
-        {
+        }),
+        Match.objectLike({
           Action: ["secretsmanager:DescribeSecret", "secretsmanager:GetSecretValue"],
           Effect: "Allow",
-        },
-        {
+        }),
+        Match.objectLike({
+          Action: "s3:PutObject",
+          Effect: "Allow",
+        }),
+        Match.objectLike({
           Action: ["bedrock:InvokeModel", "bedrock:Converse"],
           Effect: "Allow",
           Resource: [
@@ -109,8 +126,8 @@ void test("stack defines daily JST scheduler and state store", () => {
               ],
             },
           ],
-        },
-      ],
+        }),
+      ]),
     },
   });
 

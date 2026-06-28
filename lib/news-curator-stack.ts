@@ -6,6 +6,7 @@ import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { CfnSchedule } from "aws-cdk-lib/aws-scheduler";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Construct } from "constructs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -49,6 +50,13 @@ export class NewsCuratorStack extends Stack {
       },
     });
 
+    const newsHtmlBucket = new Bucket(this, "NewsHtmlBucket", {
+      websiteIndexDocument: "index.html",
+      publicReadAccess: true,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+
     const logGroup = new LogGroup(this, "NewsCuratorLogGroup", {
       logGroupName: resourceNames.logGroupName,
       retention: RetentionDays.ONE_MONTH,
@@ -87,6 +95,14 @@ export class NewsCuratorStack extends Stack {
     lambdaRole.addToPolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
+        actions: ["s3:PutObject"],
+        resources: [`${newsHtmlBucket.bucketArn}/news/*`],
+      }),
+    );
+
+    lambdaRole.addToPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
         actions: ["bedrock:InvokeModel", "bedrock:Converse"],
         resources: this.bedrockModelResourceArns(bedrockModelId ?? bedrockDefaultModelId),
       }),
@@ -118,6 +134,8 @@ export class NewsCuratorStack extends Stack {
       },
       environment: {
         BEDROCK_MODEL_ID: bedrockModelId ?? bedrockDefaultModelId,
+        NEWS_HTML_BUCKET_NAME: newsHtmlBucket.bucketName,
+        NEWS_HTML_PUBLIC_BASE_URL: newsHtmlBucket.bucketWebsiteUrl,
         NEWS_CONFIG_PATH: "config/news-sources.json",
         NOTIFIED_URL_TABLE_NAME: table.tableName,
         SLACK_SECRET_ID: slackSecret.secretArn,

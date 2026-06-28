@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { formatSlackMessages } from "../src/lambda/slack.js";
-import type { CuratedCategoryResult, CuratedTopic, NewsCategory } from "../src/lambda/types.js";
+import { formatDailySlackMessage } from "../src/lambda/slack.js";
+import type { CuratedCategoryNews, CuratedTopic, NewsCategory } from "../src/lambda/types.js";
 
 const category: NewsCategory = {
   id: "ai",
@@ -10,62 +10,76 @@ const category: NewsCategory = {
   sources: [],
 };
 
-function createTopic(topic: Pick<CuratedTopic, "title" | "summary" | "officialLink">): CuratedTopic {
+function createTopic(
+  topic: Pick<CuratedTopic, "title" | "summary" | "impact" | "checkPoint" | "officialLink">,
+): CuratedTopic {
   return {
     ...topic,
-    changed: "",
-    engineerUse: "",
-    adoption: "",
-    cautions: "",
   };
 }
 
-void test("formatSlackMessages creates readable block kit messages", () => {
-  const result: CuratedCategoryResult = {
-    todaysUpdates: [
-      createTopic({
-        title: "Nova の更新",
-        summary: "日本語の短い要約",
-        officialLink: "https://example.com/nova",
-      }),
-    ],
-  };
+void test("formatDailySlackMessage creates short daily message with HTML link", () => {
+  const categories: CuratedCategoryNews[] = [
+    {
+      category,
+      result: {
+        todaysUpdates: [
+          createTopic({
+            title: "Nova の更新",
+            summary: "日本語の要点。背景も含めて少し余裕を持たせた説明。",
+            impact: "開発チームの検証や既存ワークフローに影響する可能性がある。",
+            checkPoint: "既存設定との差分と導入優先度を確認する。",
+            officialLink: "https://example.com/nova",
+          }),
+        ],
+      },
+    },
+  ];
 
-  const messages = formatSlackMessages(category, result, new Date("2026-06-26T00:00:00+09:00"));
+  const message = formatDailySlackMessage({
+    categories,
+    date: new Date("2026-06-26T00:00:00+09:00"),
+    htmlUrl: "https://example.com/news/2026/06/26/",
+  });
 
-  assert.equal(messages.length, 1);
-  assert.equal(messages[0]?.text, "AIニュース - 2026/06/26(金)");
+  assert.equal(message.text, "📰本日のTechニュース - 2026/06/26(金)");
+  assert.equal(message.blocks.length, 1);
   assert.deepEqual(
-    messages[0]?.blocks.some((block) =>
-      JSON.stringify(block).includes("━━━━━━━━━━━━━━━━━━━━\\n*AIニュース - 2026/06/26(金)*"),
+    JSON.stringify(message.blocks).includes(
+      "━━━━━━━━━━━━━━━━━━━━\\n📰本日のTechニュース - 2026/06/26(金)\\n・Nova の更新\\n\\n本日のニュース一覧はこちら：\\nhttps://example.com/news/2026/06/26/",
     ),
     true,
   );
-  assert.deepEqual(
-    messages[0]?.blocks.some((block) =>
-      JSON.stringify(block).includes("*1. Nova の更新*\\n日本語の短い要約\\n<https://example.com/nova>"),
-    ),
-    true,
-  );
-  assert.equal(JSON.stringify(messages[0]?.blocks).includes("最近の重要アップデート"), false);
-  assert.equal(JSON.stringify(messages[0]?.blocks).includes("今日の最新情報"), false);
+  assert.equal(JSON.stringify(message.blocks).includes("要点"), false);
+  assert.equal(JSON.stringify(message.blocks).includes("影響"), false);
 });
 
-void test("formatSlackMessages splits blocks across multiple messages", () => {
+void test("formatDailySlackMessage limits headline titles", () => {
   const topic = createTopic({
     title: "Long update",
     summary: "Summary",
+    impact: "Impact",
+    checkPoint: "Check point",
     officialLink: "https://example.com/update",
   });
-  const result: CuratedCategoryResult = {
-    todaysUpdates: Array.from({ length: 50 }, (_, index) => ({
-      ...topic,
-      title: `${topic.title} ${index + 1}`,
-      officialLink: `${topic.officialLink}-${index + 1}`,
-    })),
-  };
-  const messages = formatSlackMessages(category, result, new Date("2026-06-26T00:00:00+09:00"));
+  const message = formatDailySlackMessage({
+    categories: [
+      {
+        category,
+        result: {
+          todaysUpdates: Array.from({ length: 50 }, (_, index) => ({
+            ...topic,
+            title: `${topic.title} ${index + 1}`,
+            officialLink: `${topic.officialLink}-${index + 1}`,
+          })),
+        },
+      },
+    ],
+    date: new Date("2026-06-26T00:00:00+09:00"),
+    htmlUrl: "https://example.com/news/2026/06/26/",
+  });
+  const blockText = JSON.stringify(message.blocks);
 
-  assert.ok(messages.length > 1);
-  assert.ok(messages.every((message) => message.blocks.length <= 45));
+  assert.equal(blockText.includes("Long update 5"), true);
+  assert.equal(blockText.includes("Long update 6"), false);
 });

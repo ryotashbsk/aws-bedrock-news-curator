@@ -29,14 +29,16 @@ export type CandidateTopic = {
 export type CuratedTopic = {
   readonly title: string;
   readonly summary: string;
-  readonly changed: string;
-  readonly engineerUse: string;
-  readonly nonEngineerUse?: string;
-  readonly adoption: string;
-  readonly cautions: string;
+  readonly impact: string;
+  readonly checkPoint: string;
   readonly officialLink: string;
 };
 
 export type CuratedCategoryResult = {
   readonly todaysUpdates: readonly CuratedTopic[];
+};
+
+export type CuratedCategoryNews = {
+  readonly category: NewsCategory;
+  readonly result: CuratedCategoryResult;
 };
