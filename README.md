@@ -115,7 +115,6 @@ pnpm cdk:deploy
 ```
 
 このリポジトリの CDK 系 script は、`AWS_PROFILE` 未指定時に `bedrock-news-deploy` を使う。
-リージョンの初期値は `ap-northeast-1`。
 
 ## Slack Webhook 設定
 
@@ -135,8 +134,6 @@ AWS_PROFILE=bedrock-news-deploy aws secretsmanager put-secret-value \
   --secret-string '{"webhookUrl":"https://hooks.slack.com/services/..."}' \
   --region ap-northeast-1
 ```
-
-Webhook URL は secret なので、README、Git、Slack の公開チャンネルなどに貼らない。
 
 ## コマンド
 
@@ -202,30 +199,3 @@ pnpm cdk:deploy
 ```
 
 CDK deploy 時に Lambda bundle へ `src/lambda/`、`agents/`、`config/` が同梱される。
-
-## 運用確認
-
-- Slack に日次 HTML へのリンク通知が届くこと
-- Slack のリンク先 HTML に3カテゴリ分のニュースが掲載されること
-- DynamoDB `AwsBedrockNewsCuratorNotifiedUrls` に採用 URL が保存されること
-- CloudWatch Logs `/aws/lambda/AwsBedrockNewsCuratorFunction` にエラーがないこと
-
-ログ確認:
-
-```bash
-AWS_PROFILE=bedrock-news-deploy aws logs tail \
-  /aws/lambda/AwsBedrockNewsCuratorFunction \
-  --region ap-northeast-1 \
-  --since 30m
-```
-
-## 設定変更
-
-Bedrock モデルを変える場合:
-
-```bash
-pnpm cdk:deploy -- -c bedrockModelId=amazon.nova-lite-v1:0
-```
-
-巡回対象 URL を変える場合は `config/news-sources.json` を編集する。
-カテゴリの編集方針を変える場合は `agents/*.md` を編集する。
