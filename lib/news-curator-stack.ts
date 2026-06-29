@@ -129,6 +129,7 @@ export class NewsCuratorStack extends Stack {
           afterBundling: (inputDir, outputDir) => [
             `cp -R ${inputDir}/config ${outputDir}/config`,
             `cp -R ${inputDir}/agents ${outputDir}/agents`,
+            `cp -R ${inputDir}/templates ${outputDir}/templates`,
           ],
         },
       },

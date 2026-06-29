@@ -10,9 +10,7 @@ const category: NewsCategory = {
   sources: [],
 };
 
-function createTopic(
-  topic: Pick<CuratedTopic, "title" | "summary" | "impact" | "checkPoint" | "officialLink">,
-): CuratedTopic {
+function createTopic(topic: Pick<CuratedTopic, "title" | "summary" | "officialLink">): CuratedTopic {
   return {
     ...topic,
   };
@@ -26,9 +24,7 @@ void test("formatDailySlackMessage creates short daily message with HTML link", 
         todaysUpdates: [
           createTopic({
             title: "Nova の更新",
-            summary: "日本語の要点。背景も含めて少し余裕を持たせた説明。",
-            impact: "開発チームの検証や既存ワークフローに影響する可能性がある。",
-            checkPoint: "既存設定との差分と導入優先度を確認する。",
+            summary: "日本語の要約。背景も含めて少し余裕を持たせた説明。",
             officialLink: "https://example.com/nova",
           }),
         ],
@@ -42,24 +38,21 @@ void test("formatDailySlackMessage creates short daily message with HTML link", 
     htmlUrl: "https://example.com/news/2026/06/26/",
   });
 
-  assert.equal(message.text, "📰本日のTechニュース - 2026/06/26(金)");
+  assert.equal(message.text, "🚀 本日のTechニュース - 2026/06/26(金)");
   assert.equal(message.blocks.length, 1);
   assert.deepEqual(
     JSON.stringify(message.blocks).includes(
-      "━━━━━━━━━━━━━━━━━━━━\\n📰本日のTechニュース - 2026/06/26(金)\\n・Nova の更新\\n\\n本日のニュース一覧はこちら：\\nhttps://example.com/news/2026/06/26/",
+      "━━━━━━━━━━━━━━━━━━━━\\n🚀 本日のTechニュース - 2026/06/26(金)\\n━━━━━━━━━━━━━━━━━━━━\\n■ 注目のトピックス：\\n・Nova の更新\\n\\n■ 本日のニュース一覧：\\nhttps://example.com/news/2026/06/26/",
     ),
     true,
   );
-  assert.equal(JSON.stringify(message.blocks).includes("要点"), false);
-  assert.equal(JSON.stringify(message.blocks).includes("影響"), false);
+  assert.equal(JSON.stringify(message.blocks).includes("要約"), false);
 });
 
 void test("formatDailySlackMessage limits headline titles", () => {
   const topic = createTopic({
     title: "Long update",
     summary: "Summary",
-    impact: "Impact",
-    checkPoint: "Check point",
     officialLink: "https://example.com/update",
   });
   const message = formatDailySlackMessage({

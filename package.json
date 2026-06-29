@@ -6,7 +6,6 @@
   "scripts": {
     "build": "tsc --noEmit",
     "check": "pnpm build && pnpm lint && pnpm format:check && pnpm test && pnpm cdk:synth",
-    "deploy:empty": "bash scripts/aws-cli-empty-deploy.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",

@@ -52,11 +52,10 @@ export function buildCuratorPrompt(input: {
     "あなたはチーム向け技術ニュースの編集者。",
     "次のカテゴリ指示に従い、公式一次情報の候補だけから Slack 投稿用のニュースを選別する。",
     "候補に無い情報、公式リンクが無い情報、推測情報は採用しない。",
-    "Slack 投稿に表示される title, summary, impact, checkPoint は必ず自然な日本語に翻訳・要約する。",
-    "summary は要点として2〜3文、80〜140文字を目安にする。何が変わったかと重要な背景を含める。",
-    "impact は1〜2文、40〜90文字を目安に、誰に関係するか、何に影響するかを書く。",
-    "checkPoint は1文、40〜80文字を目安に、チームで次に確認すべきことを書く。",
-    "英語の公式タイトルや本文をそのまま貼り付けない。ただしサービス名、会社名、製品名、API名、モデル名などの固有名詞は原語のまま残してよい。",
+    "title, summary は必ず日本語で書く。英語の候補ソースは、意味を保ったまま日本語として自然に再構成する。",
+    "英語の見出しや本文をそのまま転記しない。直訳調ではなく、日本語の技術ニュースとして読める表現にする。",
+    "サービス名、会社名、製品名、API名、モデル名などの固有名詞だけ原語のまま残してよい。それ以外の説明、動詞、状態、判断は日本語で書く。",
+    "summary は3〜5文、180〜260文字を目安にする。何が変わったか、重要な背景、誰に関係するか、チームで確認すべき観点を含める。",
     "出力は Markdown ではなく JSON のみ。",
     "JSON schema:",
     JSON.stringify({
@@ -64,8 +63,6 @@ export function buildCuratorPrompt(input: {
         {
           title: "string",
           summary: "string",
-          impact: "string",
-          checkPoint: "string",
           officialLink: "string",
         },
       ],
@@ -107,8 +104,6 @@ function parseTopic(value: unknown): CuratedTopic {
   return {
     title: readString(value, "title"),
     summary: readString(value, "summary"),
-    impact: readString(value, "impact"),
-    checkPoint: readString(value, "checkPoint"),
     officialLink: readString(value, "officialLink"),
   };
 }

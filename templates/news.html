@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{pageTitle}}</title>
+    <meta name="description" content="{{description}}" />
+    <style>
+      :root {
+        color-scheme: light;
+        --background: #f7f7f4;
+        --surface: #ffffff;
+        --text: #222222;
+        --muted: #626262;
+        --line: #d9d9d2;
+        --accent: #0b6bcb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.7;
+      }
+
+      a {
+        color: var(--accent);
+        text-underline-offset: 0.18em;
+      }
+
+      a:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .page {
+        width: min(100% - 32px, 960px);
+        margin: 0 auto;
+        padding: clamp(32px, 7vw, 72px) 0;
+      }
+
+      .pageHeader {
+        margin-bottom: 40px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        overflow-wrap: anywhere;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        line-height: 1.15;
+      }
+
+      .lead {
+        margin: 14px 0 0;
+        color: var(--muted);
+      }
+
+      .category {
+        padding: 32px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .category h2 {
+        margin: 0 0 18px;
+        font-size: 1.45rem;
+      }
+
+      .topicList {
+        display: grid;
+        gap: 16px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .topic {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: clamp(18px, 3vw, 24px);
+      }
+
+      .topic h3 {
+        margin: 0 0 16px;
+        font-size: 1.1rem;
+        line-height: 1.45;
+      }
+
+      .summary {
+        margin: 0;
+      }
+
+      .empty {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      @media (max-width: 640px) {
+        .topic {
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="pageHeader">
+        <p class="eyebrow">{{dateLabel}}</p>
+        <h1>🚀 本日のTechニュース</h1>
+        <p class="lead">公式一次情報から選別した更新をカテゴリ別に掲載。</p>
+      </header>
+      {{categorySections}}
+    </main>
+  </body>
+</html>

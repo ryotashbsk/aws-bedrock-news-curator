@@ -29,8 +29,6 @@ export type CandidateTopic = {
 export type CuratedTopic = {
   readonly title: string;
   readonly summary: string;
-  readonly impact: string;
-  readonly checkPoint: string;
   readonly officialLink: string;
 };
 

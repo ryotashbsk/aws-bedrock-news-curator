@@ -30,15 +30,17 @@ export function formatDailySlackMessage(input: {
   const headlineText = headlineLines.length > 0 ? headlineLines.join("\n") : "・該当なし";
   const text = [
     categoryDivider,
-    `📰本日のTechニュース - ${dateLabel}`,
+    `🚀 本日のTechニュース - ${dateLabel}`,
+    categoryDivider,
+    "■ 注目のトピックス：",
     headlineText,
     "",
-    "本日のニュース一覧はこちら：",
+    "■ 本日のニュース一覧：",
     input.htmlUrl,
   ].join("\n");
 
   return {
-    text: `📰本日のTechニュース - ${dateLabel}`,
+    text: `🚀 本日のTechニュース - ${dateLabel}`,
     blocks: [
       {
         type: "section",
