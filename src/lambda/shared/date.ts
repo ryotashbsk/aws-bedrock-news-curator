@@ -5,6 +5,7 @@ export type TokyoDateParts = {
   readonly day: string;
 };
 
+/** JST 基準の日付表示ラベルと S3 key 用日付部品。 */
 export function formatTokyoDateParts(date: Date): TokyoDateParts {
   const formatter = new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",

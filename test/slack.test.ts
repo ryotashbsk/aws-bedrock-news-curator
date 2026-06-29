@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { formatDailySlackMessage } from "../src/lambda/slack.js";
-import type { CuratedCategoryNews, CuratedTopic, NewsCategory } from "../src/lambda/types.js";
+import { formatDailySlackMessage } from "../src/lambda/notifications/slack.js";
+import type { CuratedCategoryNews, CuratedTopic, NewsCategory } from "../src/lambda/shared/types.js";
 
 const category: NewsCategory = {
   id: "ai",

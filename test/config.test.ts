@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseNewsConfig } from "../src/lambda/config.js";
+import { parseNewsConfig } from "../src/lambda/config/news-config.js";
 
 void test("parseNewsConfig accepts valid category config", () => {
   const config = parseNewsConfig({

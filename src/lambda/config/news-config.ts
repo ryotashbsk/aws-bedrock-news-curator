@@ -1,15 +1,17 @@
 import { readFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
-import type { NewsCategory, NewsConfig, NewsSource, SourceType } from "./types.js";
+import type { NewsCategory, NewsConfig, NewsSource, SourceType } from "../shared/types.js";
 
 const sourceTypes = new Set<SourceType>(["rss", "html"]);
 
+/** ニュース設定 JSON の読み込みと検証。 */
 export async function loadNewsConfig(configPath: string, baseDir: string): Promise<NewsConfig> {
   const resolvedPath = isAbsolute(configPath) ? configPath : join(baseDir, configPath);
   const rawConfig = JSON.parse(await readFile(resolvedPath, "utf8")) as unknown;
   return parseNewsConfig(rawConfig);
 }
 
+/** unknown の設定値を Lambda 内部で使う型へ変換。 */
 export function parseNewsConfig(value: unknown): NewsConfig {
   if (!isRecord(value) || !Array.isArray(value.categories)) {
     throw new Error("news config must include categories");

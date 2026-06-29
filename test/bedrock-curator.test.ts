@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildCuratorPrompt, parseCuratedResult } from "../src/lambda/bedrock-curator.js";
+import { buildCuratorPrompt, parseCuratedResult } from "../src/lambda/curation/bedrock-curator.js";
 
 void test("parseCuratedResult extracts JSON from fenced response", () => {
   const result = parseCuratedResult(`\`\`\`json

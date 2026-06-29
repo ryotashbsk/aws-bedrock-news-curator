@@ -1,15 +1,15 @@
 import { readFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
-import { loadNewsConfig } from "./config.js";
-import { curateWithBedrock } from "./bedrock-curator.js";
-import { fetchCandidateTopics } from "./source-fetcher.js";
-import { createDynamoHistoryStore } from "./history-store.js";
-import { loadSlackWebhookUrl } from "./secrets.js";
-import { formatNewsHtml } from "./news-html.js";
-import { uploadNewsHtml } from "./news-page-store.js";
-import { formatDailySlackMessage, postSlackMessages } from "./slack.js";
-import type { CandidateTopic, CuratedCategoryNews, CuratedCategoryResult, CuratedTopic } from "./types.js";
-import { normalizeUrl } from "./url.js";
+import { loadNewsConfig } from "./config/news-config.js";
+import { curateWithBedrock } from "./curation/bedrock-curator.js";
+import { formatDailySlackMessage, postSlackMessages } from "./notifications/slack.js";
+import { formatNewsHtml } from "./output/news-html.js";
+import { normalizeUrl } from "./shared/url.js";
+import type { CandidateTopic, CuratedCategoryNews, CuratedCategoryResult, CuratedTopic } from "./shared/types.js";
+import { fetchCandidateTopics } from "./sources/source-fetcher.js";
+import { createDynamoHistoryStore } from "./storage/history-store.js";
+import { uploadNewsHtml } from "./storage/news-page-store.js";
+import { loadSlackWebhookUrl } from "./storage/secrets.js";
 
 type HandlerResult = {
   readonly postedCategories: readonly string[];
@@ -18,6 +18,7 @@ type HandlerResult = {
 
 const workspaceRoot = process.cwd();
 
+/** ニュース収集から通知履歴保存までの Lambda 実行入口。 */
 export async function handler(): Promise<HandlerResult> {
   const env = readEnvironment();
   const config = await loadNewsConfig(env.newsConfigPath, workspaceRoot);
@@ -81,10 +82,12 @@ function filterCuratedResultByCandidates(
   };
 }
 
+/** Bedrock 応答から、今回取得した候補 URL に含まれる記事だけを残す。 */
 function filterCuratedTopics(topics: readonly CuratedTopic[], candidateUrls: ReadonlySet<string>): CuratedTopic[] {
   return topics.filter((topic) => candidateUrls.has(normalizeUrl(topic.officialLink)));
 }
 
+/** 既通知 URL と同一実行内の重複 URL を除外した候補一覧。 */
 async function filterFreshCandidates(
   categoryId: string,
   candidates: readonly CandidateTopic[],
@@ -105,11 +108,13 @@ async function filterFreshCandidates(
   return freshCandidates;
 }
 
+/** カテゴリ別エージェントプロンプトの読み込み。 */
 async function readAgentPrompt(promptPath: string): Promise<string> {
   const resolvedPath = isAbsolute(promptPath) ? promptPath : join(workspaceRoot, promptPath);
   return readFile(resolvedPath, "utf8");
 }
 
+/** Lambda 実行に必要な環境変数一覧。 */
 function readEnvironment(): {
   readonly bedrockModelId: string;
   readonly newsHtmlBucketName: string;
@@ -128,6 +133,7 @@ function readEnvironment(): {
   };
 }
 
+/** 必須環境変数の取得。未設定時は起動失敗扱い。 */
 function readEnv(key: string): string {
   const value = process.env[key];
   if (!value) {

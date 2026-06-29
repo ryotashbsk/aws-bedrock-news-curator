@@ -1,10 +1,11 @@
-import type { CandidateTopic, NewsSource } from "./types.js";
-import { normalizeUrl } from "./url.js";
+import type { CandidateTopic, NewsSource } from "../shared/types.js";
+import { normalizeUrl } from "../shared/url.js";
 
 const maxExcerptLength = 900;
 const maxTopicsPerSource = 8;
 const fetchTimeoutMs = 10_000;
 
+/** 複数ニュースソースから候補トピックを取得。失敗したソースはスキップ。 */
 export async function fetchCandidateTopics(sources: readonly NewsSource[]): Promise<CandidateTopic[]> {
   const results = await Promise.allSettled(sources.map(fetchSourceTopics));
   return results.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
@@ -28,6 +29,7 @@ async function fetchSourceTopics(source: NewsSource): Promise<CandidateTopic[]> 
   return source.type === "rss" ? parseFeed(body, source) : parseHtml(body, source);
 }
 
+/** RSS / Atom の item / entry から候補トピックを抽出。 */
 export function parseFeed(body: string, source: NewsSource): CandidateTopic[] {
   const itemBlocks = extractBlocks(body, "item").concat(extractBlocks(body, "entry"));
   return itemBlocks.slice(0, maxTopicsPerSource).flatMap((block) => {
@@ -55,6 +57,7 @@ export function parseFeed(body: string, source: NewsSource): CandidateTopic[] {
   });
 }
 
+/** HTML ページ内の同一ドメインリンクから候補トピックを抽出。 */
 export function parseHtml(body: string, source: NewsSource): CandidateTopic[] {
   const anchors = Array.from(body.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi));
   const topics: CandidateTopic[] = [];
@@ -90,6 +93,7 @@ export function parseHtml(body: string, source: NewsSource): CandidateTopic[] {
   return topics;
 }
 
+/** HTML ソースから指定タグの本文ブロック一覧を抽出。 */
 function extractBlocks(body: string, tagName: string): string[] {
   const pattern = new RegExp(`<${tagName}\\b[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "gi");
   return Array.from(body.matchAll(pattern), (match) => match[1] ?? "");

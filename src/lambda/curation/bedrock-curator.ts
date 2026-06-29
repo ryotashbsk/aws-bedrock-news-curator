@@ -1,8 +1,9 @@
 import { BedrockRuntimeClient, ConverseCommand } from "@aws-sdk/client-bedrock-runtime";
-import type { CandidateTopic, CuratedCategoryResult, CuratedTopic, NewsCategory } from "./types.js";
+import type { CandidateTopic, CuratedCategoryResult, CuratedTopic, NewsCategory } from "../shared/types.js";
 
 const bedrockClient = new BedrockRuntimeClient({});
 
+/** 候補トピックを Bedrock に渡し、カテゴリごとの掲載ニュースへ整形。 */
 export async function curateWithBedrock(input: {
   readonly modelId: string;
   readonly category: NewsCategory;
@@ -42,6 +43,7 @@ export async function curateWithBedrock(input: {
   return parseCuratedResult(text);
 }
 
+/** Bedrock に渡す編集指示と候補一覧のプロンプト生成。 */
 export function buildCuratorPrompt(input: {
   readonly category: NewsCategory;
   readonly agentPrompt: string;
@@ -79,6 +81,7 @@ export function buildCuratorPrompt(input: {
   ].join("\n");
 }
 
+/** Bedrock のテキスト応答から JSON を取り出し、要約結果へ変換。 */
 export function parseCuratedResult(text: string): CuratedCategoryResult {
   const parsed = JSON.parse(extractJson(text)) as unknown;
   if (!isRecord(parsed)) {
@@ -108,6 +111,7 @@ function parseTopic(value: unknown): CuratedTopic {
   };
 }
 
+/** Markdown フェンス付き応答にも対応した JSON 本体の抽出。 */
 function extractJson(text: string): string {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1];
   if (fenced) {

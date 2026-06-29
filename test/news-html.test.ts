@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { formatNewsHtml } from "../src/lambda/news-html.js";
-import type { CuratedCategoryNews, CuratedTopic, NewsCategory } from "../src/lambda/types.js";
+import { formatNewsHtml } from "../src/lambda/output/news-html.js";
+import type { CuratedCategoryNews, CuratedTopic, NewsCategory } from "../src/lambda/shared/types.js";
 
 const category: NewsCategory = {
   id: "frontend",

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeUrl } from "../src/lambda/url.js";
+import { normalizeUrl } from "../src/lambda/shared/url.js";
 
 void test("normalizeUrl removes fragments and tracking parameters", () => {
   assert.equal(

@@ -1,13 +1,14 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import type { CandidateTopic, CuratedTopic } from "./types.js";
-import { normalizeUrl } from "./url.js";
+import type { CandidateTopic, CuratedTopic } from "../shared/types.js";
+import { normalizeUrl } from "../shared/url.js";
 
 export type HistoryStore = {
   readonly hasNotified: (categoryId: string, url: string) => Promise<boolean>;
   readonly markNotified: (categoryId: string, topic: CuratedTopic | CandidateTopic) => Promise<void>;
 };
 
+/** DynamoDB を使ったカテゴリ別通知履歴ストア生成。 */
 export function createDynamoHistoryStore(tableName: string): HistoryStore {
   const documentClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 

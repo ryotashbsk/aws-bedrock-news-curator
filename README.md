@@ -63,17 +63,17 @@ CDK:
 Lambda:
 
 - `src/lambda/handler.ts`: Lambda の実行入口。収集、要約、HTML 生成、Slack 投稿、履歴保存をつなぐ
-- `src/lambda/config.ts`: `config/news-sources.json` の読み込みと構造チェック
-- `src/lambda/source-fetcher.ts`: RSS / Atom / HTML から候補トピックを抽出
-- `src/lambda/bedrock-curator.ts`: Bedrock Converse API 呼び出し、プロンプト生成、JSON 応答の parse
-- `src/lambda/news-html.ts`: `templates/news.html` を使って日次 HTML を生成
-- `src/lambda/news-page-store.ts`: 生成した HTML を S3 にアップロード
-- `src/lambda/slack.ts`: Slack メッセージ整形と送信
-- `src/lambda/history-store.ts`: DynamoDB による通知履歴管理
-- `src/lambda/secrets.ts`: Secrets Manager から Slack Webhook URL を取得
-- `src/lambda/date.ts`: JST の日付表示と S3 key 用の日付部品を生成
-- `src/lambda/url.ts`: URL 正規化
-- `src/lambda/types.ts`: 設定、候補、要約結果などの型定義
+- `src/lambda/config/news-config.ts`: `config/news-sources.json` の読み込みと構造チェック
+- `src/lambda/sources/source-fetcher.ts`: RSS / Atom / HTML から候補トピックを抽出
+- `src/lambda/curation/bedrock-curator.ts`: Bedrock Converse API 呼び出し、プロンプト生成、JSON 応答の parse
+- `src/lambda/output/news-html.ts`: `templates/news.html` を使って日次 HTML を生成
+- `src/lambda/storage/news-page-store.ts`: 生成した HTML を S3 にアップロード
+- `src/lambda/notifications/slack.ts`: Slack メッセージ整形と送信
+- `src/lambda/storage/history-store.ts`: DynamoDB による通知履歴管理
+- `src/lambda/storage/secrets.ts`: Secrets Manager から Slack Webhook URL を取得
+- `src/lambda/shared/date.ts`: JST の日付表示と S3 key 用の日付部品を生成
+- `src/lambda/shared/url.ts`: URL 正規化
+- `src/lambda/shared/types.ts`: 設定、候補、要約結果などの型定義
 
 設定・プロンプト:
 
