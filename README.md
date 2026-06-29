@@ -93,20 +93,9 @@ Lambda:
 - `test/slack.test.ts`: Slack メッセージ生成のテスト
 - `test/url.test.ts`: URL 正規化のテスト
 
-プロジェクト設定:
-
-- `package.json`: pnpm scripts と依存関係
-- `pnpm-lock.yaml`: pnpm の依存バージョン固定
-- `tsconfig.json`: TypeScript 設定
-- `eslint.config.js`: ESLint 設定
-- `.prettierrc.json` / `.prettierignore`: Prettier 設定
-- `.gitignore`: Git 管理対象外の指定
-
 生成物・ローカル環境:
 
-- `cdk.out/`: `pnpm cdk:synth` の生成物。Git 管理対象外
-- `node_modules/`: 依存パッケージ。Git 管理対象外
-- `.vscode/`: VS Code 用設定
+- `cdk.out/`: `pnpm cdk:synth` の生成物。
 
 ## 初期設定
 
