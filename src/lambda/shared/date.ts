@@ -5,7 +5,7 @@ export type TokyoDateParts = {
   readonly day: string;
 };
 
-/** JST 基準の日付表示ラベルと S3 key 用日付部品。 */
+/** JST 基準の日付表示ラベルと S3 key 用日付部品 */
 export function formatTokyoDateParts(date: Date): TokyoDateParts {
   const formatter = new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",
@@ -24,7 +24,7 @@ export function formatTokyoDateParts(date: Date): TokyoDateParts {
   };
 }
 
-/** 2つの日付が JST 基準で同じ年月日かを判定。 */
+/** 2つの日付が JST 基準で同じ年月日かを判定 */
 export function isSameTokyoDate(date: Date, referenceDate: Date): boolean {
   const dateParts = formatTokyoDateParts(date);
   const referenceParts = formatTokyoDateParts(referenceDate);

@@ -3,13 +3,12 @@ import type { CandidateTopic, CuratedCategoryResult, CuratedTopic, NewsCategory 
 
 const bedrockClient = new BedrockRuntimeClient({});
 
-/** 候補トピックを Bedrock に渡し、カテゴリごとの掲載ニュースへ整形。 */
+/** 候補トピックを Bedrock に渡し、カテゴリごとの掲載ニュースへ整形 */
 export async function curateWithBedrock(input: {
   readonly modelId: string;
   readonly category: NewsCategory;
   readonly agentPrompt: string;
   readonly candidates: readonly CandidateTopic[];
-  readonly previousUrls: readonly string[];
 }): Promise<CuratedCategoryResult> {
   if (input.candidates.length === 0) {
     return { todaysUpdates: [] };
@@ -43,12 +42,11 @@ export async function curateWithBedrock(input: {
   return parseCuratedResult(text);
 }
 
-/** Bedrock に渡す編集指示と候補一覧のプロンプト生成。 */
+/** Bedrock に渡す編集指示と候補一覧のプロンプト生成 */
 export function buildCuratorPrompt(input: {
   readonly category: NewsCategory;
   readonly agentPrompt: string;
   readonly candidates: readonly CandidateTopic[];
-  readonly previousUrls: readonly string[];
 }): string {
   return [
     "あなたはチーム向け技術ニュースの編集者。",
@@ -73,15 +71,12 @@ export function buildCuratorPrompt(input: {
     "カテゴリ指示:",
     input.agentPrompt,
     "",
-    "昨日以前に通知済みのURL。これらは採用しない:",
-    JSON.stringify(input.previousUrls, null, 2),
-    "",
     "候補トピック:",
     JSON.stringify(input.candidates, null, 2),
   ].join("\n");
 }
 
-/** Bedrock のテキスト応答から JSON を取り出し、要約結果へ変換。 */
+/** Bedrock のテキスト応答から JSON を取り出し、要約結果へ変換 */
 export function parseCuratedResult(text: string): CuratedCategoryResult {
   const parsed = JSON.parse(extractJson(text)) as unknown;
   if (!isRecord(parsed)) {
@@ -111,7 +106,7 @@ function parseTopic(value: unknown): CuratedTopic {
   };
 }
 
-/** Markdown フェンス付き応答にも対応した JSON 本体の抽出。 */
+/** Markdown フェンス付き応答にも対応した JSON 本体の抽出 */
 function extractJson(text: string): string {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1];
   if (fenced) {

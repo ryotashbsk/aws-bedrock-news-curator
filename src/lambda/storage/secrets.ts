@@ -2,7 +2,7 @@ import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-sec
 
 const secretsClient = new SecretsManagerClient({});
 
-/** Secrets Manager から Slack Incoming Webhook URL を取得。 */
+/** Secrets Manager から Slack Incoming Webhook URL を取得 */
 export async function loadSlackWebhookUrl(secretId: string): Promise<string> {
   const result = await secretsClient.send(new GetSecretValueCommand({ SecretId: secretId }));
   const secretString = result.SecretString;

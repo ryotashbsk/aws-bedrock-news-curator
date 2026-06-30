@@ -34,7 +34,6 @@ void test("buildCuratorPrompt strongly instructs Japanese rewriting", () => {
     },
     agentPrompt: "AIカテゴリの指示",
     candidates: [],
-    previousUrls: [],
   });
 
   assert.equal(prompt.includes("title, summary は必ず日本語で書く"), true);

@@ -20,7 +20,7 @@ export type SlackMessage = {
   readonly blocks: readonly SlackBlock[];
 };
 
-/** 日次ニュース一覧へのリンクを含む Slack 投稿メッセージ生成。 */
+/** 日次ニュース一覧へのリンクを含む Slack 投稿メッセージ生成 */
 export function formatDailySlackMessage(input: {
   readonly categories: readonly CuratedCategoryNews[];
   readonly date: Date;
@@ -54,7 +54,7 @@ export function formatDailySlackMessage(input: {
   };
 }
 
-/** Slack Incoming Webhook へのメッセージ送信。 */
+/** Slack Incoming Webhook へのメッセージ送信 */
 export async function postSlackMessages(webhookUrl: string, messages: readonly SlackMessage[]): Promise<void> {
   for (const message of messages) {
     const response = await fetch(webhookUrl, {

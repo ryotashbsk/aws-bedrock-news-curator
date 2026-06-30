@@ -11,7 +11,7 @@ type NewsHtmlCategory = {
 const templatePath = join(process.cwd(), "templates/news.html");
 const newsTemplate = readFileSync(templatePath, "utf8");
 
-/** カテゴリ別ニュースを日次公開ページ用 HTML へ変換。 */
+/** カテゴリ別ニュースを日次公開ページ用 HTML へ変換 */
 export function formatNewsHtml(input: {
   readonly categories: readonly CuratedCategoryNews[];
   readonly date: Date;
@@ -66,7 +66,7 @@ function escapeAttribute(value: string): string {
   return escapeHtml(value).replace(/\n/g, " ");
 }
 
-/** HTML テンプレートの単純なプレースホルダー置換。 */
+/** HTML テンプレートの単純なプレースホルダー置換 */
 function renderTemplate(template: string, values: Record<string, string>): string {
   return template.replace(/\{\{([a-zA-Z0-9]+)\}\}/g, (match, key: string) => {
     return values[key] ?? match;

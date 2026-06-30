@@ -1,4 +1,4 @@
-/** 比較用 URL 正規化。fragment と主要な tracking parameter を除去。 */
+/** 比較用 URL 正規化。fragment と主要な tracking parameter を除去 */
 export function normalizeUrl(value: string): string {
   const url = new URL(value);
   url.hash = "";

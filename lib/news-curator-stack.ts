@@ -1,5 +1,4 @@
 import { ArnFormat, Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
-import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
 import { Effect, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Architecture, Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
@@ -20,7 +19,6 @@ const resourceNames = {
   logGroupName: "/aws/lambda/AwsBedrockNewsCuratorFunction",
   schedulerName: "AwsBedrockNewsCuratorWeekdayMorningSchedule",
   schedulerRoleName: "AwsBedrockNewsCuratorSchedulerRole",
-  tableName: "AwsBedrockNewsCuratorNotifiedUrls",
 } as const;
 
 export class NewsCuratorStack extends Stack {
@@ -31,14 +29,6 @@ export class NewsCuratorStack extends Stack {
     const scheduleExpression = this.node.tryGetContext("scheduleExpression") as string | undefined;
     const scheduleTimezone = this.node.tryGetContext("scheduleTimezone") as string | undefined;
     const slackSecretName = this.node.tryGetContext("slackSecretName") as string | undefined;
-
-    const table = new Table(this, "NotifiedUrlTable", {
-      tableName: resourceNames.tableName,
-      partitionKey: { name: "category", type: AttributeType.STRING },
-      sortKey: { name: "url", type: AttributeType.STRING },
-      billingMode: BillingMode.PAY_PER_REQUEST,
-      removalPolicy: RemovalPolicy.RETAIN,
-    });
 
     const slackSecret = new Secret(this, "SlackWebhookSecret", {
       secretName: slackSecretName ?? "aws-bedrock-news-curator/slack-webhook",
@@ -73,14 +63,6 @@ export class NewsCuratorStack extends Stack {
         effect: Effect.ALLOW,
         actions: ["logs:CreateLogStream", "logs:PutLogEvents"],
         resources: [`${logGroup.logGroupArn}:*`],
-      }),
-    );
-
-    lambdaRole.addToPolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: ["dynamodb:DescribeTable", "dynamodb:GetItem", "dynamodb:PutItem"],
-        resources: [table.tableArn],
       }),
     );
 
@@ -138,7 +120,6 @@ export class NewsCuratorStack extends Stack {
         NEWS_HTML_BUCKET_NAME: newsHtmlBucket.bucketName,
         NEWS_HTML_PUBLIC_BASE_URL: newsHtmlBucket.bucketWebsiteUrl,
         NEWS_CONFIG_PATH: "config/news-sources.json",
-        NOTIFIED_URL_TABLE_NAME: table.tableName,
         SLACK_SECRET_ID: slackSecret.secretArn,
       },
     });
@@ -158,7 +139,7 @@ export class NewsCuratorStack extends Stack {
     new CfnSchedule(this, "WeekdayMorningSchedule", {
       name: resourceNames.schedulerName,
       flexibleTimeWindow: { mode: "OFF" },
-      scheduleExpression: scheduleExpression ?? "cron(0 8 * * ? *)",
+      scheduleExpression: scheduleExpression ?? "cron(0 7 * * ? *)",
       scheduleExpressionTimezone: scheduleTimezone ?? "Asia/Tokyo",
       target: {
         arn: curatorFunction.functionArn,

@@ -6,7 +6,7 @@ const maxExcerptLength = 900;
 const maxTopicsPerSource = 8;
 const fetchTimeoutMs = 10_000;
 
-/** 複数ニュースソースから候補トピックを取得。失敗したソースはスキップ。 */
+/** 複数ニュースソースから候補トピックを取得。失敗したソースはスキップ */
 export async function fetchCandidateTopics(
   sources: readonly NewsSource[],
   referenceDate: Date = new Date(),
@@ -32,7 +32,7 @@ async function fetchSourceTopics(source: NewsSource, referenceDate: Date): Promi
   return parseFeed(body, source, referenceDate);
 }
 
-/** RSS / Atom の item / entry から候補トピックを抽出。 */
+/** RSS / Atom の item / entry から候補トピックを抽出 */
 export function parseFeed(body: string, source: NewsSource, referenceDate: Date = new Date()): CandidateTopic[] {
   const itemBlocks = extractBlocks(body, "item").concat(extractBlocks(body, "entry"));
   return itemBlocks
@@ -61,7 +61,7 @@ export function parseFeed(body: string, source: NewsSource, referenceDate: Date 
     .slice(0, maxTopicsPerSource);
 }
 
-/** XML ソースから指定タグの本文ブロック一覧を抽出。 */
+/** XML ソースから指定タグの本文ブロック一覧を抽出 */
 function extractBlocks(body: string, tagName: string): string[] {
   const pattern = new RegExp(`<${tagName}\\b[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "gi");
   return Array.from(body.matchAll(pattern), (match) => match[1] ?? "");

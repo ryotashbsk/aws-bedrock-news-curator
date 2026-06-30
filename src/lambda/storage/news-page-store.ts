@@ -3,7 +3,7 @@ import { formatTokyoDateParts } from "../shared/date.js";
 
 const s3Client = new S3Client({});
 
-/** 生成済みニュース HTML を S3 に保存し、公開 URL を返却。 */
+/** 生成済みニュース HTML を S3 に保存し、公開 URL を返却 */
 export async function uploadNewsHtml(input: {
   readonly bucketName: string;
   readonly publicBaseUrl: string;
@@ -25,7 +25,7 @@ export async function uploadNewsHtml(input: {
   return `${input.publicBaseUrl.replace(/\/$/, "")}/${key}`;
 }
 
-/** 日付別ニュース HTML の S3 object key 生成。 */
+/** 日付別ニュース HTML の S3 object key 生成 */
 export function createNewsHtmlKey(date: Date): string {
   const { year, month, day } = formatTokyoDateParts(date);
   return `news/${year}/${month}/${day}/index.html`;

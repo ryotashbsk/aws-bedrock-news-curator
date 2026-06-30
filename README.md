@@ -7,10 +7,9 @@
 
 主な構成:
 
-- EventBridge Scheduler: 毎日 08:00 JST に Lambda を起動
-- Lambda: 公式 URL 取得、Bedrock 要約、HTML 生成、S3 アップロード、Slack 投稿、通知履歴保存
+- EventBridge Scheduler: 毎日 07:00 JST に Lambda を起動
+- Lambda: 公式 URL 取得、Bedrock 要約、HTML 生成、S3 アップロード、Slack 投稿
 - S3: 日次 HTML を静的公開
-- DynamoDB: 通知済み URL の重複排除
 - Secrets Manager: Slack Incoming Webhook URL
 - Bedrock: `bedrockModelId` で指定したモデルを利用
 
@@ -19,12 +18,11 @@
 1. `config/news-sources.json` からカテゴリと巡回対象 URL を読み込む
 2. `agents/*.md` のカテゴリ別編集方針を読み込む
 3. RSS / Atom から候補トピックを抽出
-4. DynamoDB の通知履歴を使い、通知済み URL を除外
+4. 同一実行内の重複 URL を除外
 5. 候補と編集方針を Bedrock に渡し、JSON 形式の要約結果を得る
 6. 候補 URL に存在しない `officialLink` を除外
 7. 日次 HTML を S3 にアップロード
 8. Slack に注目トピックと HTML URL を投稿
-9. 投稿成功後、採用 URL を DynamoDB に保存
 
 ## 通知内容
 
@@ -57,19 +55,18 @@ http://example-bucket.s3-website-ap-northeast-1.amazonaws.com/news/2026/06/28/in
 CDK:
 
 - `bin/app.ts`: CDK app の入口
-- `lib/news-curator-stack.ts`: Lambda、DynamoDB、S3、Secrets Manager、Scheduler、IAM Role などの AWS リソース定義
+- `lib/news-curator-stack.ts`: Lambda、S3、Secrets Manager、Scheduler、IAM Role などの AWS リソース定義
 - `cdk.json`: CDK app 起動コマンドと context 設定
 
 Lambda:
 
-- `src/lambda/handler.ts`: Lambda の実行入口。収集、要約、HTML 生成、Slack 投稿、履歴保存をつなぐ
+- `src/lambda/handler.ts`: Lambda の実行入口。収集、要約、HTML 生成、Slack 投稿をつなぐ
 - `src/lambda/config/news-config.ts`: `config/news-sources.json` の読み込みと構造チェック
 - `src/lambda/sources/source-fetcher.ts`: RSS / Atom から候補トピックを抽出
 - `src/lambda/curation/bedrock-curator.ts`: Bedrock Converse API 呼び出し、プロンプト生成、JSON 応答の parse
 - `src/lambda/output/news-html.ts`: `templates/news.html` を使って日次 HTML を生成
 - `src/lambda/storage/news-page-store.ts`: 生成した HTML を S3 にアップロード
 - `src/lambda/notifications/slack.ts`: Slack メッセージ整形と送信
-- `src/lambda/storage/history-store.ts`: DynamoDB による通知履歴管理
 - `src/lambda/storage/secrets.ts`: Secrets Manager から Slack Webhook URL を取得
 - `src/lambda/shared/date.ts`: JST の日付表示と S3 key 用の日付部品を生成
 - `src/lambda/shared/url.ts`: URL 正規化
@@ -181,7 +178,7 @@ cat /tmp/news-curator-result.json
 ```
 
 手動実行でも実際に Slack へ投稿される。
-2回目以降は DynamoDB の通知履歴により、同じ URL が除外される。
+同日に再実行した場合も、その時点の本日分 RSS をもとに再投稿される。
 
 ## 変更反映
 
