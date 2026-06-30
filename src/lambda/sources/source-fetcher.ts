@@ -1,4 +1,5 @@
 import type { CandidateTopic, NewsSource } from "../shared/types.js";
+import { isSameTokyoDate } from "../shared/date.js";
 import { normalizeUrl } from "../shared/url.js";
 
 const maxExcerptLength = 900;
@@ -6,18 +7,20 @@ const maxTopicsPerSource = 8;
 const fetchTimeoutMs = 10_000;
 
 /** 複数ニュースソースから候補トピックを取得。失敗したソースはスキップ。 */
-export async function fetchCandidateTopics(sources: readonly NewsSource[]): Promise<CandidateTopic[]> {
-  const results = await Promise.allSettled(sources.map(fetchSourceTopics));
+export async function fetchCandidateTopics(
+  sources: readonly NewsSource[],
+  referenceDate: Date = new Date(),
+): Promise<CandidateTopic[]> {
+  const results = await Promise.allSettled(sources.map((source) => fetchSourceTopics(source, referenceDate)));
   return results.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
 }
 
-async function fetchSourceTopics(source: NewsSource): Promise<CandidateTopic[]> {
+async function fetchSourceTopics(source: NewsSource, referenceDate: Date): Promise<CandidateTopic[]> {
   const response = await fetch(source.url, {
     signal: AbortSignal.timeout(fetchTimeoutMs),
     headers: {
       "user-agent": "aws-bedrock-news-curator/0.1 (+https://aws.amazon.com/bedrock/)",
-      accept:
-        source.type === "rss" ? "application/rss+xml, application/atom+xml, application/xml, text/xml" : "text/html",
+      accept: "application/rss+xml, application/atom+xml, application/xml, text/xml",
     },
   });
 
@@ -26,74 +29,39 @@ async function fetchSourceTopics(source: NewsSource): Promise<CandidateTopic[]> 
   }
 
   const body = await response.text();
-  return source.type === "rss" ? parseFeed(body, source) : parseHtml(body, source);
+  return parseFeed(body, source, referenceDate);
 }
 
 /** RSS / Atom の item / entry から候補トピックを抽出。 */
-export function parseFeed(body: string, source: NewsSource): CandidateTopic[] {
+export function parseFeed(body: string, source: NewsSource, referenceDate: Date = new Date()): CandidateTopic[] {
   const itemBlocks = extractBlocks(body, "item").concat(extractBlocks(body, "entry"));
-  return itemBlocks.slice(0, maxTopicsPerSource).flatMap((block) => {
-    const title = decodeEntities(stripTags(readTag(block, "title")));
-    const link = readTag(block, "link") || readAtomLink(block);
-    const publishedAt = readTag(block, "pubDate") || readTag(block, "published") || readTag(block, "updated");
-    const excerpt = decodeEntities(
-      stripTags(readTag(block, "description") || readTag(block, "summary") || readTag(block, "content")),
-    );
+  return itemBlocks
+    .flatMap((block) => {
+      const title = decodeEntities(stripTags(readTag(block, "title")));
+      const link = readTag(block, "link") || readAtomLink(block);
+      const publishedAt = readTag(block, "pubDate") || readTag(block, "published") || readTag(block, "updated");
+      const excerpt = decodeEntities(
+        stripTags(readTag(block, "description") || readTag(block, "summary") || readTag(block, "content")),
+      );
 
-    if (!title || !link) {
-      return [];
-    }
+      if (!title || !link || !isPublishedToday(publishedAt, referenceDate)) {
+        return [];
+      }
 
-    return [
-      {
-        title,
-        url: normalizeUrl(link),
-        sourceName: source.name,
-        sourceType: source.type,
-        excerpt: truncate(excerpt || title, maxExcerptLength),
-        ...(publishedAt ? { publishedAt } : {}),
-      },
-    ];
-  });
+      return [
+        {
+          title,
+          url: normalizeUrl(link),
+          sourceName: source.name,
+          excerpt: truncate(excerpt || title, maxExcerptLength),
+          ...(publishedAt ? { publishedAt } : {}),
+        },
+      ];
+    })
+    .slice(0, maxTopicsPerSource);
 }
 
-/** HTML ページ内の同一ドメインリンクから候補トピックを抽出。 */
-export function parseHtml(body: string, source: NewsSource): CandidateTopic[] {
-  const anchors = Array.from(body.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi));
-  const topics: CandidateTopic[] = [];
-  const seenUrls = new Set<string>();
-  const baseUrl = new URL(source.url);
-
-  for (const match of anchors) {
-    const href = match[1];
-    const label = decodeEntities(stripTags(match[2] ?? ""));
-    if (!href || label.length < 8) {
-      continue;
-    }
-
-    const url = normalizeUrl(new URL(href, baseUrl).toString());
-    if (seenUrls.has(url) || shouldSkipHtmlLink(url, baseUrl)) {
-      continue;
-    }
-
-    seenUrls.add(url);
-    topics.push({
-      title: label,
-      url,
-      sourceName: source.name,
-      sourceType: source.type,
-      excerpt: truncate(label, maxExcerptLength),
-    });
-
-    if (topics.length >= maxTopicsPerSource) {
-      break;
-    }
-  }
-
-  return topics;
-}
-
-/** HTML ソースから指定タグの本文ブロック一覧を抽出。 */
+/** XML ソースから指定タグの本文ブロック一覧を抽出。 */
 function extractBlocks(body: string, tagName: string): string[] {
   const pattern = new RegExp(`<${tagName}\\b[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "gi");
   return Array.from(body.matchAll(pattern), (match) => match[1] ?? "");
@@ -126,9 +94,9 @@ function decodeEntities(value: string): string {
     .trim();
 }
 
-function shouldSkipHtmlLink(url: string, baseUrl: URL): boolean {
-  const parsed = new URL(url);
-  return parsed.hostname !== baseUrl.hostname || parsed.pathname === "/" || parsed.pathname === baseUrl.pathname;
+function isPublishedToday(publishedAt: string, referenceDate: Date): boolean {
+  const publishedDate = new Date(publishedAt);
+  return !Number.isNaN(publishedDate.getTime()) && isSameTokyoDate(publishedDate, referenceDate);
 }
 
 function truncate(value: string, maxLength: number): string {

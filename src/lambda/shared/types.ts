@@ -1,5 +1,3 @@
-export type SourceType = "rss" | "html";
-
 export type NewsCategory = {
   readonly id: string;
   readonly title: string;
@@ -10,7 +8,6 @@ export type NewsCategory = {
 export type NewsSource = {
   readonly name: string;
   readonly url: string;
-  readonly type: SourceType;
 };
 
 export type NewsConfig = {
@@ -21,7 +18,6 @@ export type CandidateTopic = {
   readonly title: string;
   readonly url: string;
   readonly sourceName: string;
-  readonly sourceType: SourceType;
   readonly excerpt: string;
   readonly publishedAt?: string;
 };

@@ -18,7 +18,7 @@
 
 1. `config/news-sources.json` からカテゴリと巡回対象 URL を読み込む
 2. `agents/*.md` のカテゴリ別編集方針を読み込む
-3. RSS / Atom / HTML から候補トピックを抽出
+3. RSS / Atom から候補トピックを抽出
 4. DynamoDB の通知履歴を使い、通知済み URL を除外
 5. 候補と編集方針を Bedrock に渡し、JSON 形式の要約結果を得る
 6. 候補 URL に存在しない `officialLink` を除外
@@ -64,7 +64,7 @@ Lambda:
 
 - `src/lambda/handler.ts`: Lambda の実行入口。収集、要約、HTML 生成、Slack 投稿、履歴保存をつなぐ
 - `src/lambda/config/news-config.ts`: `config/news-sources.json` の読み込みと構造チェック
-- `src/lambda/sources/source-fetcher.ts`: RSS / Atom / HTML から候補トピックを抽出
+- `src/lambda/sources/source-fetcher.ts`: RSS / Atom から候補トピックを抽出
 - `src/lambda/curation/bedrock-curator.ts`: Bedrock Converse API 呼び出し、プロンプト生成、JSON 応答の parse
 - `src/lambda/output/news-html.ts`: `templates/news.html` を使って日次 HTML を生成
 - `src/lambda/storage/news-page-store.ts`: 生成した HTML を S3 にアップロード

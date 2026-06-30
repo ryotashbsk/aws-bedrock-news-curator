@@ -24,6 +24,17 @@ export function formatTokyoDateParts(date: Date): TokyoDateParts {
   };
 }
 
+/** 2つの日付が JST 基準で同じ年月日かを判定。 */
+export function isSameTokyoDate(date: Date, referenceDate: Date): boolean {
+  const dateParts = formatTokyoDateParts(date);
+  const referenceParts = formatTokyoDateParts(referenceDate);
+  return (
+    dateParts.year === referenceParts.year &&
+    dateParts.month === referenceParts.month &&
+    dateParts.day === referenceParts.day
+  );
+}
+
 function readDatePart(parts: readonly Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes): string {
   const part = parts.find((value) => value.type === type);
   if (!part) {

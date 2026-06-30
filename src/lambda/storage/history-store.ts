@@ -33,7 +33,6 @@ export function createDynamoHistoryStore(tableName: string): HistoryStore {
             category: categoryId,
             url: normalizeUrl("officialLink" in topic ? topic.officialLink : topic.url),
             title: topic.title,
-            sourceType: "sourceType" in topic ? topic.sourceType : "bedrock",
             notifiedAt: new Date().toISOString(),
           },
         }),

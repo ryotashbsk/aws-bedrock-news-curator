@@ -1,8 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
-import type { NewsCategory, NewsConfig, NewsSource, SourceType } from "../shared/types.js";
-
-const sourceTypes = new Set<SourceType>(["rss", "html"]);
+import type { NewsCategory, NewsConfig, NewsSource } from "../shared/types.js";
 
 /** ニュース設定 JSON の読み込みと検証。 */
 export async function loadNewsConfig(configPath: string, baseDir: string): Promise<NewsConfig> {
@@ -49,15 +47,9 @@ function parseSource(value: unknown): NewsSource {
     throw new Error("news source must be an object");
   }
 
-  const type = readString(value, "type");
-  if (!sourceTypes.has(type as SourceType)) {
-    throw new Error(`unsupported source type: ${type}`);
-  }
-
   return {
     name: readString(value, "name"),
     url: readString(value, "url"),
-    type: type as SourceType,
   };
 }
 

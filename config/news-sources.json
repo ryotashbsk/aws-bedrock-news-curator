@@ -5,17 +5,18 @@
       "title": "フロントエンドニュース",
       "agentPromptPath": "agents/frontend-news.md",
       "sources": [
-        { "name": "React Blog", "url": "https://react.dev/blog", "type": "html" },
-        { "name": "Next.js Blog", "url": "https://nextjs.org/blog", "type": "html" },
-        { "name": "TypeScript Blog", "url": "https://devblogs.microsoft.com/typescript/feed/", "type": "rss" },
-        { "name": "Vite Releases", "url": "https://github.com/vitejs/vite/releases.atom", "type": "rss" },
-        { "name": "Chrome Developers Blog", "url": "https://developer.chrome.com/blog/feed.xml", "type": "rss" },
-        { "name": "web.dev", "url": "https://web.dev/feed.xml", "type": "rss" },
-        { "name": "MDN Blog", "url": "https://developer.mozilla.org/en-US/blog/rss.xml", "type": "rss" },
-        { "name": "WebKit Blog", "url": "https://webkit.org/feed/", "type": "rss" },
-        { "name": "Astro Blog", "url": "https://astro.build/rss.xml", "type": "rss" },
-        { "name": "Svelte Blog", "url": "https://svelte.dev/blog/rss.xml", "type": "rss" },
-        { "name": "Vue Blog", "url": "https://blog.vuejs.org/feed.rss", "type": "rss" }
+        { "name": "React Blog", "url": "https://react.dev/rss.xml" },
+        { "name": "Next.js Blog", "url": "https://nextjs.org/feed.xml" },
+        { "name": "TypeScript Blog", "url": "https://devblogs.microsoft.com/typescript/feed/" },
+        { "name": "Vite Releases", "url": "https://github.com/vitejs/vite/releases.atom" },
+        { "name": "Chrome Developers Blog", "url": "https://developer.chrome.com/blog/feed.xml" },
+        { "name": "web.dev", "url": "https://web.dev/feed.xml" },
+        { "name": "MDN Blog", "url": "https://developer.mozilla.org/en-US/blog/rss.xml" },
+        { "name": "WebKit Blog", "url": "https://webkit.org/feed/" },
+        { "name": "Astro Blog", "url": "https://astro.build/rss.xml" },
+        { "name": "Svelte Blog", "url": "https://svelte.dev/blog/rss.xml" },
+        { "name": "Vue Blog", "url": "https://blog.vuejs.org/feed.rss" },
+        { "name": "Vercel Changelog", "url": "https://vercel.com/atom" }
       ]
     },
     {
@@ -23,16 +24,23 @@
       "title": "バックエンドニュース",
       "agentPromptPath": "agents/backend-news.md",
       "sources": [
-        { "name": "Node.js Blog", "url": "https://nodejs.org/en/feed/blog.xml", "type": "rss" },
-        { "name": "Deno Blog", "url": "https://deno.com/feed", "type": "rss" },
-        { "name": "Bun Blog", "url": "https://bun.sh/rss.xml", "type": "rss" },
-        { "name": "AWS What's New", "url": "https://aws.amazon.com/about-aws/whats-new/recent/feed/", "type": "rss" },
-        { "name": "Google Cloud Blog", "url": "https://cloudblog.withgoogle.com/rss/", "type": "rss" },
-        { "name": "Azure Updates", "url": "https://azurecomcdn.azureedge.net/en-us/updates/feed/", "type": "rss" },
-        { "name": "PostgreSQL News", "url": "https://www.postgresql.org/about/newsarchive/", "type": "html" },
-        { "name": "Docker Blog", "url": "https://www.docker.com/blog/feed/", "type": "rss" },
-        { "name": "Kubernetes Blog", "url": "https://kubernetes.io/feed.xml", "type": "rss" },
-        { "name": "GitHub Changelog", "url": "https://github.blog/changelog/feed/", "type": "rss" }
+        { "name": "Node.js Blog", "url": "https://nodejs.org/en/feed/blog.xml" },
+        { "name": "Deno Blog", "url": "https://deno.com/feed" },
+        { "name": "Bun Blog", "url": "https://bun.sh/rss.xml" },
+        { "name": "AWS What's New", "url": "https://aws.amazon.com/about-aws/whats-new/recent/feed/" },
+        { "name": "Google Cloud Blog", "url": "https://cloudblog.withgoogle.com/rss/" },
+        { "name": "Azure Updates", "url": "https://azurecomcdn.azureedge.net/en-us/updates/feed/" },
+        { "name": "PostgreSQL News", "url": "https://www.postgresql.org/news.rss" },
+        { "name": "Docker Blog", "url": "https://www.docker.com/blog/feed/" },
+        { "name": "Kubernetes Blog", "url": "https://kubernetes.io/feed.xml" },
+        { "name": "GitHub Changelog", "url": "https://github.blog/changelog/feed/" },
+        { "name": "Cloudflare Blog", "url": "https://blog.cloudflare.com/rss/" },
+        { "name": "Supabase", "url": "https://supabase.com/rss.xml" },
+        { "name": "Prisma Blog", "url": "https://www.prisma.io/blog/rss.xml" },
+        { "name": "Sentry Blog", "url": "https://blog.sentry.io/feed.xml" },
+        { "name": "GitLab Releases", "url": "https://docs.gitlab.com/releases/releases.xml" },
+        { "name": "Mozilla Security Blog", "url": "https://blog.mozilla.org/security/feed/" },
+        { "name": "Ruby on Rails Blog", "url": "https://rubyonrails.org/feed.xml" }
       ]
     },
     {
@@ -40,22 +48,13 @@
       "title": "AIニュース",
       "agentPromptPath": "agents/ai-news.md",
       "sources": [
-        { "name": "OpenAI News", "url": "https://openai.com/news/rss.xml", "type": "rss" },
-        {
-          "name": "OpenAI Changelog",
-          "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
-          "type": "html"
-        },
-        { "name": "Anthropic News", "url": "https://www.anthropic.com/news/rss.xml", "type": "rss" },
-        { "name": "Google AI Blog", "url": "https://blog.google/technology/ai/rss/", "type": "rss" },
-        { "name": "Google Developers Blog", "url": "https://developers.googleblog.com/en/rss/", "type": "rss" },
-        { "name": "Cursor Changelog", "url": "https://www.cursor.com/changelog", "type": "html" },
-        {
-          "name": "GitHub Copilot Changelog",
-          "url": "https://github.blog/changelog/label/copilot/feed/",
-          "type": "rss"
-        },
-        { "name": "Hugging Face Blog", "url": "https://huggingface.co/blog/feed.xml", "type": "rss" }
+        { "name": "OpenAI News", "url": "https://openai.com/news/rss.xml" },
+        { "name": "Anthropic News", "url": "https://www.anthropic.com/news/rss.xml" },
+        { "name": "Google AI Blog", "url": "https://blog.google/technology/ai/rss/" },
+        { "name": "Google Developers Blog", "url": "https://developers.googleblog.com/en/rss/" },
+        { "name": "Cursor Changelog", "url": "https://cursor.com/changelog/rss.xml" },
+        { "name": "GitHub Copilot Changelog", "url": "https://github.blog/changelog/label/copilot/feed/" },
+        { "name": "Hugging Face Blog", "url": "https://huggingface.co/blog/feed.xml" }
       ]
     }
   ]

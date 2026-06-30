@@ -9,16 +9,16 @@ void test("parseNewsConfig accepts valid category config", () => {
         id: "ai",
         title: "AIニュース",
         agentPromptPath: "agents/ai-news.md",
-        sources: [{ name: "OpenAI", url: "https://openai.com/news/rss.xml", type: "rss" }],
+        sources: [{ name: "OpenAI", url: "https://openai.com/news/rss.xml" }],
       },
     ],
   });
 
   assert.equal(config.categories[0]?.id, "ai");
-  assert.equal(config.categories[0]?.sources[0]?.type, "rss");
+  assert.equal(config.categories[0]?.sources[0]?.url, "https://openai.com/news/rss.xml");
 });
 
-void test("parseNewsConfig rejects unsupported source type", () => {
+void test("parseNewsConfig rejects missing source url", () => {
   assert.throws(
     () =>
       parseNewsConfig({
@@ -27,10 +27,10 @@ void test("parseNewsConfig rejects unsupported source type", () => {
             id: "ai",
             title: "AIニュース",
             agentPromptPath: "agents/ai-news.md",
-            sources: [{ name: "OpenAI", url: "https://openai.com/news/rss.xml", type: "api" }],
+            sources: [{ name: "OpenAI" }],
           },
         ],
       }),
-    /unsupported source type/,
+    /missing string property: url/,
   );
 });
