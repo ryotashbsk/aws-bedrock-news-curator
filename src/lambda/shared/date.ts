@@ -35,6 +35,7 @@ export function isSameTokyoDate(date: Date, referenceDate: Date): boolean {
   );
 }
 
+/** Intl.DateTimeFormatPart[] から指定 type の値を抽出。存在しない場合は例外 */
 function readDatePart(parts: readonly Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes): string {
   const part = parts.find((value) => value.type === type);
   if (!part) {

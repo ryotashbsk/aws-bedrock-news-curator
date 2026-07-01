@@ -33,6 +33,7 @@ export function formatNewsHtml(input: {
   });
 }
 
+/** カテゴリ別ニュースを HTML セクションへ変換 */
 function renderCategorySection(category: NewsHtmlCategory): string {
   return [
     '<section class="category">',
@@ -44,6 +45,7 @@ function renderCategorySection(category: NewsHtmlCategory): string {
   ].join("\n");
 }
 
+/** ニューストピックを HTML リストアイテムへ変換 */
 function renderTopicItem(topic: CuratedTopic): string {
   return [
     '<li class="topic">',
@@ -53,6 +55,7 @@ function renderTopicItem(topic: CuratedTopic): string {
   ].join("\n");
 }
 
+/** HTML エスケープ */
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -62,6 +65,7 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/** HTML 属性値エスケープ */
 function escapeAttribute(value: string): string {
   return escapeHtml(value).replace(/\n/g, " ");
 }

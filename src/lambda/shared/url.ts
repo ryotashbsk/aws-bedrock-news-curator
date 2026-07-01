@@ -13,6 +13,7 @@ export function normalizeUrl(value: string): string {
   return normalized.endsWith("/") ? normalized.slice(0, -1) : normalized;
 }
 
+/** 主要な tracking parameter 判定 */
 function isTrackingParameter(key: string): boolean {
   const lowerKey = key.toLowerCase();
   return lowerKey.startsWith("utm_") || lowerKey === "ref" || lowerKey === "source";

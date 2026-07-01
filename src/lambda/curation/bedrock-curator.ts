@@ -88,6 +88,7 @@ export function parseCuratedResult(text: string): CuratedCategoryResult {
   };
 }
 
+/** JSON 配列を CuratedTopic[] へ変換 */
 function parseTopicArray(value: unknown, key: string): CuratedTopic[] {
   if (!Array.isArray(value)) {
     throw new Error(`curated result must include ${key}`);
@@ -95,6 +96,7 @@ function parseTopicArray(value: unknown, key: string): CuratedTopic[] {
   return value.map(parseTopic);
 }
 
+/** JSON オブジェクトを CuratedTopic へ変換 */
 function parseTopic(value: unknown): CuratedTopic {
   if (!isRecord(value)) {
     throw new Error("curated topic must be an object");
@@ -121,6 +123,7 @@ function extractJson(text: string): string {
   return text.slice(start, end + 1);
 }
 
+/** オブジェクトの文字列プロパティを取得。存在しない場合は例外 */
 function readString(value: Record<string, unknown>, key: string): string {
   const property = value[key];
   if (typeof property !== "string" || property.trim().length === 0) {
@@ -129,6 +132,7 @@ function readString(value: Record<string, unknown>, key: string): string {
   return property;
 }
 
+/** オブジェクト型判定 */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }

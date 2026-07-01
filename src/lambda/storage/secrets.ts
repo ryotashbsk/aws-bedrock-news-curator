@@ -22,6 +22,7 @@ export async function loadSlackWebhookUrl(secretId: string): Promise<string> {
   return parsed.webhookUrl;
 }
 
+/** オブジェクト型判定 */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }

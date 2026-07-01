@@ -43,7 +43,7 @@ export class NewsCuratorStack extends Stack {
     const newsHtmlBucket = new Bucket(this, "NewsHtmlBucket", {
       websiteIndexDocument: "index.html",
       publicReadAccess: true,
-      blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ACLS_ONLY,
       removalPolicy: RemovalPolicy.RETAIN,
     });
 
@@ -181,12 +181,14 @@ export class NewsCuratorStack extends Stack {
   }
 }
 
+/** Foundation Model ID 判定 */
 function isFoundationModelId(modelId: string): boolean {
   return ["amazon.", "anthropic.", "ai21.", "cohere.", "meta.", "mistral."].some((prefix) =>
     modelId.startsWith(prefix),
   );
 }
 
+/** Inference Profile から Foundation Model ID を抽出 */
 function toFoundationModelId(modelId: string): string {
   const providerIndex = ["amazon.", "anthropic.", "ai21.", "cohere.", "meta.", "mistral."]
     .map((providerPrefix) => modelId.indexOf(providerPrefix))

@@ -70,12 +70,14 @@ export async function postSlackMessages(webhookUrl: string, messages: readonly S
   }
 }
 
+/** カテゴリ別ニュースから注目トピックのタイトルを抽出。最大件数制限あり */
 function selectHeadlineTitles(categories: readonly CuratedCategoryNews[]): string[] {
   return categories
     .flatMap((categoryNews) => categoryNews.result.todaysUpdates.map((topic) => topic.title))
     .slice(0, maxHeadlineCount);
 }
 
+/** Slack 投稿用テキストをエスケープ */
 function escapeSlackText(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

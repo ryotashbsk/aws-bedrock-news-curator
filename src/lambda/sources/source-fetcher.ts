@@ -15,6 +15,7 @@ export async function fetchCandidateTopics(
   return results.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
 }
 
+/** ニュースソースから候補トピックを取得 */
 async function fetchSourceTopics(source: NewsSource, referenceDate: Date): Promise<CandidateTopic[]> {
   const response = await fetch(source.url, {
     signal: AbortSignal.timeout(fetchTimeoutMs),
@@ -67,15 +68,18 @@ function extractBlocks(body: string, tagName: string): string[] {
   return Array.from(body.matchAll(pattern), (match) => match[1] ?? "");
 }
 
+/** 指定タグの本文を抽出。存在しない場合は空文字列 */
 function readTag(block: string, tagName: string): string {
   const pattern = new RegExp(`<${tagName}\\b[^>]*>([\\s\\S]*?)<\\/${tagName}>`, "i");
   return block.match(pattern)?.[1]?.trim() ?? "";
 }
 
+/** Atom の link タグから href 属性を抽出。存在しない場合は空文字列 */
 function readAtomLink(block: string): string {
   return block.match(/<link\b[^>]*href=["']([^"']+)["'][^>]*>/i)?.[1]?.trim() ?? "";
 }
 
+/** HTML タグを除去してテキスト化 */
 function stripTags(value: string): string {
   return value
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
@@ -84,6 +88,7 @@ function stripTags(value: string): string {
     .trim();
 }
 
+/** HTML エンティティをデコード */
 function decodeEntities(value: string): string {
   return value
     .replace(/&amp;/g, "&")
@@ -94,11 +99,13 @@ function decodeEntities(value: string): string {
     .trim();
 }
 
+/** 指定日付が東京時間で今日かどうか判定 */
 function isPublishedToday(publishedAt: string, referenceDate: Date): boolean {
   const publishedDate = new Date(publishedAt);
   return !Number.isNaN(publishedDate.getTime()) && isSameTokyoDate(publishedDate, referenceDate);
 }
 
+/** 文字列を指定長に切り詰め。切り詰めた場合は末尾に "…" を付与 */
 function truncate(value: string, maxLength: number): string {
   return value.length <= maxLength ? value : `${value.slice(0, maxLength - 1)}…`;
 }
